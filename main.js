@@ -5,7 +5,8 @@ var on = false;
 var grid = {
 	size: 300,
 	start: 20,
-	end: 5300
+	end: 3300,
+	sampleSize: 4096
 };
 var canvas = document.querySelector("canvas");
 var context = canvas.getContext("2d");
@@ -37,9 +38,12 @@ function process(event) {
 	times++;
 
 	var inputBuffer = event.inputBuffer;
-	if(times == 1) {
-		console.log(event.inputBuffer.getChannelData(0));
-	}
+	//if(times == 1) {
+		const data = event.inputBuffer.getChannelData(0);
+		worker.postMessage({ message: 'sound', data: data });
+		// data.sort((a, b) => a - b);
+		// console.log(data[0], data[data.length - 1]);
+	//}
 }
 
 buildGrid(grid);
@@ -48,6 +52,13 @@ initCanvas();
 var worker = new Worker('worker.js');
 
 worker.postMessage({ message: 'grid', data: grid });
+
+worker.onmessage = function(data) {
+	data = data.data;
+	addLine(data);
+	/*data.sort((a, b) => a - b);
+	console.log(data[0], data[data.length - 1]);*/
+}
 
 console.log(grid);
 
@@ -87,7 +98,7 @@ function start() {
 				var audioContext = new AudioContext();
 				var microphone = audioContext.createMediaStreamSource(stream);
 				window.source = microphone; // Workaround for https://bugzilla.mozilla.org/show_bug.cgi?id=934512
-				var scriptProcessor = audioContext.createScriptProcessor(4096, 1, 1);
+				var scriptProcessor = audioContext.createScriptProcessor(grid.sampleSize, 1, 1);
 
 				scriptProcessor.connect(audioContext.destination);
 				microphone.connect(scriptProcessor);
