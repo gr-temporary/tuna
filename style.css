@@ -4,3 +4,8 @@ html, body {
 	padding: 0;
 	font-family: Arial;
 }
+
+main {
+	max-width: 600px;
+	margin: 0 auto;
+}
