@@ -9,3 +9,22 @@ main {
 	max-width: 600px;
 	margin: 0 auto;
 }
+
+.spectrogram {
+	position: relative;
+	padding: 0;
+	margin-top: 20px;
+}
+
+.line {
+	position: absolute;
+	height: 0;
+	width: 100%;
+	border-top: 1px solid rgba(255,255,255,0.3);
+}
+
+.line label {
+	position: absolute;
+	left: 100%;
+	transform: translate(0, -50%);
+}

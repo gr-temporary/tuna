@@ -1,5 +1,7 @@
 
-var app = new Vue({
+let steps = 0;
+
+const app = new Vue({
 	el: "main",
 	data: {
 		init: false,
@@ -7,13 +9,18 @@ var app = new Vue({
 		grid: {
 			size: 300,
 			timeSpan: 600,
-			start: 50,
+			start: 30,
 			end: 5000,
 			sampleSize: 4096
 		},
 		ctx: null,
 		worker: null,
-		TEST: false
+		TEST: false,
+		currentFrequency: {
+			frequency: 0,
+			note: '',
+			step: 0
+		}
 	},
 	methods: {
 		buildGrid: function() {
@@ -47,13 +54,20 @@ var app = new Vue({
 
 			let data;
 			if(this.TEST) {
-				data = new Float32Array(4096);
-				for(let i=0; i<4096; i++) {
-					data[i] = Math.sin(2 * Math.PI * this.grid.steps[10] * i / 44100) 
-					+ Math.sin(2 * Math.PI * this.grid.steps[100] * i / 44100)
-					+ Math.sin(2 * Math.PI * this.grid.steps[200] * i / 44100)
-					+ Math.sin(2 * Math.PI * this.grid.steps[290] * i / 44100);
+				data = new Float32Array(this.grid.sampleSize);
+				for(let i=0; i<this.grid.sampleSize; i++) {
+					let k = 2 * Math.PI * (steps * this.grid.sampleSize + i) / 44100;
+					data[i] = Math.sin(this.grid.steps[10] * k) 
+					+ Math.sin(this.grid.steps[50] * k)
+					+ Math.sin(this.grid.steps[100] * k)
+					+ Math.sin(this.grid.steps[150] * k)
+					+ Math.sin(this.grid.steps[200] * k)
+					+ Math.sin(this.grid.steps[250] * k)
+					+ Math.sin(this.grid.steps[290] * k)
+					//+ (Math.random() - 0.5) * 0.2;
 				}
+				steps++;
+				console.log(data[0], data[data.length - 1]);
 			} else {
 				const inputBuffer = event.inputBuffer;
 				data = event.inputBuffer.getChannelData(0);
@@ -112,6 +126,14 @@ var app = new Vue({
 						console.log(err);
 					});
 			}
+		},
+		moveLine: function(event) {
+			let rect = this.$refs.spectrogram.getBoundingClientRect();
+			let y = event.pageY - rect.top;
+			y = Math.min(this.grid.size - 1, this.grid.size - y);
+			y = Math.max(y, 0);
+			this.currentFrequency.frequency = this.grid.steps[y].toFixed(2);
+			this.currentFrequency.step = (this.grid.size - y - 1) + "px";
 		}
 	},
 	mounted: function() {
