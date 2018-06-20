@@ -7,10 +7,11 @@
 </head>
 <body>
 	<main>
-	<canvas id="spectrogram"></canvas>
-		<button onclick="start()">Поехали</button>
-		<button onclick="stop()">Стоп</button>
+		<canvas ref="spectrogram"></canvas>
+		<button @click="start()" v-if="!on">Поехали</button>
+		<button @click="start()" v-if="on">Стоп</button>
 	</main>
+	<script src="vue.js"></script>
 	<script src="main.js"></script>
 </body>
 </html>
