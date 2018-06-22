@@ -8,6 +8,7 @@ function Buffer(topRange, leap) {
 	this.end = null;
 	this.leap = leap;
 	this.range = topRange;
+	this.mask = new Float32Array(this.leap);
 }
 
 Buffer.prototype.init = function (size) {
@@ -20,9 +21,11 @@ Buffer.prototype.push = function (data) {
 		this.buffer.set(data, 0);
 		return;
 	}
+	this.buffer.copyWithin(0, this.buffer.length / this.leap, this.buffer.length);
+	let start = this.buffer.length - this.buffer.length / this.leap;
 	for(let i=0; i<data.length-this.leap; i+=this.leap) {
-		this.buffer[this.end] = data[i];
-		this.end = (this.end + 1) % this.buffer.length;
+		this.buffer[start] = data[i];
+		start++;
 	}
 }
 
@@ -32,9 +35,9 @@ Buffer.prototype.get = function (i) {
 
 let buffers = [
 	//(new Buffer(60, 4)),
-	//(new Buffer(120, 3)),
+	//(new Buffer(120, 8)),
 	//(new Buffer(400, 2)),
-	(new Buffer(20000, 1)),
+	(new Buffer(20000, 4)),
 ];
 
 function blur(data) {
@@ -54,9 +57,7 @@ function buildGrid() {
 		let leap = buffers.find(x => x.range > grid.steps[i]).leap;
 		for(let j=0; j<grid.sampleSize; j++) {
 			let k = i * grid.sampleSize + j;
-			let a;
-			// different sampling rates for high and low frequencies
-			a = j * 2 * Math.PI * grid.steps[i] * leap / 44100;
+			let a = j * 2 * Math.PI * grid.steps[i] * leap / 44100;
 			grid.points[k * 2] = Math.sin(a);
 			grid.points[k * 2 + 1] = Math.cos(a);
 		}

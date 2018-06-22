@@ -9,13 +9,13 @@ const app = new Vue({
 		grid: {
 			size: 300,
 			timeSpan: 600,
-			start: 30,
+			start: 250,
 			end: 5000,
 			sampleSize: 4096
 		},
 		ctx: null,
 		worker: null,
-		TEST: false,
+		TEST: true,
 		currentFrequency: {
 			frequency: 0,
 			note: '',
@@ -67,7 +67,7 @@ const app = new Vue({
 					//+ (Math.random() - 0.5) * 0.2;
 				}
 				steps++;
-				console.log(data[0], data[data.length - 1]);
+				//console.log(data[0], data[data.length - 1]);
 			} else {
 				const inputBuffer = event.inputBuffer;
 				data = event.inputBuffer.getChannelData(0);
